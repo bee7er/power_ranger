@@ -1,2 +1,4 @@
 # power_ranger
 A utility to make arbitrary frame rendering more flexible in Cinema 4D utilising the Takes system
+
+Copyright: PowerHouse Industries Nov 2023
