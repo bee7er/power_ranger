@@ -1,6 +1,7 @@
 """
-Copyright: PowerHouse Industries Nov 2023
-Author: Brian Etheridge
+Application:    Power Ranger Plugin
+Copyright:      PowerHouse Industries Nov 2023
+Author:         Brian Etheridge
 """
 
 import c4d, time

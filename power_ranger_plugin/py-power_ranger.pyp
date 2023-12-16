@@ -1,6 +1,7 @@
 """
-Copyright: PowerHouse Industries Nov 2023
-Author: Brian Etheridge
+Application:    Power Ranger Plugin
+Copyright:      PowerHouse Industries Nov 2023
+Author:         Brian Etheridge
 
 Description:
     A Cinema 4D plugin to assist with rendering individual or ranges of frames using the Takes system.
@@ -19,20 +20,17 @@ import rb_functions, rb_handle_render_ranges
 __res__ = c4d.plugins.GeResource()
 __res__.Init(__root__)
 
-# TODO Unique ID can be obtained from www.plugincafe.com
-PLUGIN_ID = 1052356
+# Unique ID obtained from www.plugincafe.com 20231214
+PLUGIN_ID = 1062133
 GROUP_ID_HELP = 100000
 GROUP_ID_FORM = 100001
 
 FRAME_RANGES_HELP_1 = 100012
 FRAME_RANGES_HELP_2 = 100013
-FRAME_RANGES_HELP_3 = 100014
-FRAME_RANGES_TEXT = 100015
 EDIT_FRAME_RANGES_TEXT = 100016
 RENDER_BUTTON = 100017
 CLOSE_BUTTON = 100018
-BLANK_TEXT_1 = 100019
-BLANK_TEXT_2 = 100020
+TAG_LINE = 100021
 
 config = rb_functions.get_config_values()
 debug = bool(int(config.get(rb_functions.CONFIG_SECTION, 'debug')))
@@ -50,7 +48,7 @@ class RangerDlg(c4d.gui.GeDialog):
     # ===================================================================
         """ Called when Cinema 4D creates the dialog """
 
-        self.SetTitle("Range Breaker")
+        self.SetTitle("Power Ranger")
 
         self.GroupBegin(id=GROUP_ID_HELP, flags=c4d.BFH_SCALEFIT, cols=1, rows=3)
         # Spaces: left, top, right, bottom
@@ -58,19 +56,21 @@ class RangerDlg(c4d.gui.GeDialog):
         """ Instructions """
         self.AddStaticText(id=FRAME_RANGES_HELP_1, flags=c4d.BFV_MASK, initw=385, name="Specify one or more frames or ranges of frames.", borderstyle=c4d.BORDER_NONE)
         self.AddStaticText(id=FRAME_RANGES_HELP_2, flags=c4d.BFV_MASK, initw=385, name="Example: 1,8,10-15,55", borderstyle=c4d.BORDER_NONE)
-        self.AddStaticText(id=FRAME_RANGES_HELP_3, flags=c4d.BFV_MASK, initw=385, name="Frames are rendered to the Picture Viewer.", borderstyle=c4d.BORDER_NONE)
+        self.GroupEnd()
+
+        self.GroupBegin(id=GROUP_ID_HELP, flags=c4d.BFH_SCALEFIT, cols=1, rows=1)
+        # Spaces: left, top, right, bottom
+        self.GroupBorderSpace(10,0,10,0)
+        """ Custom ranges field """
+        self.AddEditText(id=EDIT_FRAME_RANGES_TEXT, flags=c4d.BFV_MASK, initw=440, inith=16, editflags=0)
+        self.SetString(id=EDIT_FRAME_RANGES_TEXT, value=self.customFrameRanges)
+        self.AddStaticText(id=TAG_LINE, flags=c4d.BFH_RIGHT, initw=440, name="https://powerhouse.industries", borderstyle=c4d.BORDER_NONE)
         self.GroupEnd()
 
         self.GroupBegin(id=GROUP_ID_FORM, flags=c4d.BFH_SCALEFIT, cols=2, rows=5)
         # Spaces: left, top, right, bottom
-        self.GroupBorderSpace(10,10,10,20)
-        """ Custom ranges field """
-        self.AddStaticText(id=FRAME_RANGES_TEXT, flags=c4d.BFV_MASK, initw=145, name="Custom frame ranges: ", borderstyle=c4d.BORDER_NONE)
-        self.AddEditText(id=EDIT_FRAME_RANGES_TEXT, flags=c4d.BFV_MASK, initw=240, inith=16, editflags=0)
-        self.SetString(id=EDIT_FRAME_RANGES_TEXT, value=self.customFrameRanges)
+        self.GroupBorderSpace(10,20,10,20)
         """ Button fields """
-        self.AddStaticText(id=BLANK_TEXT_1, flags=c4d.BFV_MASK, initw=145, name="", borderstyle=c4d.BORDER_NONE)
-        self.AddStaticText(id=BLANK_TEXT_2, flags=c4d.BFV_MASK, initw=145, name="", borderstyle=c4d.BORDER_NONE)
         self.AddButton(id=CLOSE_BUTTON, flags=c4d.BFH_RIGHT | c4d.BFV_CENTER, initw=100, inith=16, name="Close")
         self.AddButton(id=RENDER_BUTTON, flags=c4d.BFH_LEFT | c4d.BFV_CENTER, initw=100, inith=16, name="Render")
         self.GroupEnd()
@@ -201,7 +201,7 @@ class RangerDlgCommand(c4d.plugins.CommandData):
 # ===================================================================
 if __name__ == "__main__":
     if True == verbose:
-        print("Setting up Ranger Breaker Plugin")
+        print("Setting up Power Ranger Plugin")
 
     # Retrieves the icon path
     directory, _ = os.path.split(__file__)
@@ -218,11 +218,11 @@ if __name__ == "__main__":
 
     # Registers the plugin
     c4d.plugins.RegisterCommandPlugin(id=PLUGIN_ID,
-                                      str="Range Breaker using the Take System",
+                                      str="Power Ranger using the Take System",
                                       info=0,
-                                      help="Range Breaker",
+                                      help="Power Ranger",
                                       dat=RangerDlgCommand(),
                                       icon=bbmp)
 
     if True == verbose:
-        print("Range Breaker Plugin set up ok")
+        print("Power Ranger Plugin set up ok")
