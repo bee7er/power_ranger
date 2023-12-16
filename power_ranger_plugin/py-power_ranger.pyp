@@ -64,7 +64,8 @@ class RangerDlg(c4d.gui.GeDialog):
         """ Custom ranges field """
         self.AddEditText(id=EDIT_FRAME_RANGES_TEXT, flags=c4d.BFV_MASK, initw=440, inith=16, editflags=0)
         self.SetString(id=EDIT_FRAME_RANGES_TEXT, value=self.customFrameRanges)
-        self.AddStaticText(id=TAG_LINE, flags=c4d.BFH_RIGHT, initw=440, name="https://powerhouse.industries", borderstyle=c4d.BORDER_NONE)
+        self.AddStaticText(id=TAG_LINE, flags=c4d.BFH_FIT | c4d.BFH_RIGHT, initw=440, name="Powerhouse Industries", borderstyle=c4d.BORDER_NONE)
+        # self.AddStaticText(id=TAG_LINE, flags=c4d.BFH_RIGHT, initw=440, name="https://powerhouse.industries", borderstyle=c4d.BORDER_NONE)
         self.GroupEnd()
 
         self.GroupBegin(id=GROUP_ID_FORM, flags=c4d.BFH_SCALEFIT, cols=2, rows=5)
