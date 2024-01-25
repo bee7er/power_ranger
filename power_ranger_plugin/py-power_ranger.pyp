@@ -135,8 +135,6 @@ class RangerDlg(c4d.gui.GeDialog):
 
         # User clicked on the Gaps button
         elif messageId == GAPS_BUTTON:
-            print("*** Gaps button clicked")
-
             # Create entries in the render queue for gaps in the images in the output folder
             if True == self.calcImageGapDetails():
                 # Update the dialog with the normalised frame ranges
@@ -163,6 +161,8 @@ class RangerDlg(c4d.gui.GeDialog):
         for any gaps in the sequence.  We return the sequence numbers of
         the gaps.
         '''
+        print('*** Checking for gaps in the rendered image sequence')
+
         renderData = rb_functions.get_render_settings()
         # Check to see if we have a save path defined
         outputPath = renderData[PATH]
@@ -201,8 +201,9 @@ class RangerDlg(c4d.gui.GeDialog):
                     return False
 
                 if False == dirSequenceNumberElem.isnumeric():
-                    # Ignore non-numeric elements
-                    print('*** Ignoring non-numeric sequence ' + dirSequenceNumberElem)
+                    if True == debug:
+                        # Ignore non-numeric elements
+                        print('*** Ignoring non-numeric sequence ' + dirSequenceNumberElem)
                     continue
 
                 seqLen = newLen
@@ -229,7 +230,8 @@ class RangerDlg(c4d.gui.GeDialog):
             lastElem = ''
             for dirSequenceNumberStr in dirSequenceNumberList:
                 if lastElem == dirSequenceNumberStr:
-                    print('*** Removing duplicate sequence ' + dirSequenceNumberStr)
+                    if True == debug:
+                        print('*** Removing duplicate sequence ' + dirSequenceNumberStr)
                     dirSequenceNumberList.remove(dirSequenceNumberStr)
 
                 lastElem = dirSequenceNumberStr
@@ -243,8 +245,8 @@ class RangerDlg(c4d.gui.GeDialog):
 
                 if testSequenceNumberStr != dirSequenceNumberStr:
                     while testSequenceNumberStr != dirSequenceNumberStr:
-
-                        print('*** Sequence Number required: ' + testSequenceNumberStr)
+                        if True == debug:
+                            print('*** Sequence number required: ' + testSequenceNumberStr)
                         returnedSequenceNumbers += (sep + str(int(testSequenceNumberStr)))
                         sep = ','
 
@@ -256,7 +258,7 @@ class RangerDlg(c4d.gui.GeDialog):
             return False
 
         else:
-            self.customFrameRanges = returnedSequenceNumbers
+            self.customFrameRanges, self.customFrameRangesAry = rb_functions.analyse_frame_ranges(returnedSequenceNumbers)
 
         return True
 
