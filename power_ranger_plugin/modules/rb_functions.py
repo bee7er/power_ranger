@@ -21,6 +21,7 @@ RANGE_FROM = "RANGE_FROM"
 RANGE_TO = "RANGE_TO"
 RANGE_STEP = "RANGE_STEP"
 FRAME_RATE = "FRAME_RATE"
+PATH = "RDATA_PATH"
 
 CONFIG_SECTION = 'CONFIG'
 CONFIG_RANGER_SECTION = 'RANGER'
@@ -126,7 +127,7 @@ def analyse_frame_ranges(frameRangeStr):
 def sortNumeric(val):
 # ===================================================================
     # We sort on the first element of the array, but make sure it is
-    # a numeric comparison so that 7 is before 15 (ie '7' > '15')
+    # a numeric comparison so that 7 is before 15 (ie '7' < '15')
     return int(val[0])
 
 # ===================================================================
@@ -301,12 +302,15 @@ def get_render_settings():
 
     activeDocument = c4d.documents.GetActiveDocument()
     renderData = activeDocument.GetActiveRenderData()
+    if renderData is None:
+        raise RuntimeError("Failed to retrieve the active render data")
 
     return {
         RANGE_FROM: int(renderData[c4d.RDATA_FRAMEFROM].Get() * renderData[c4d.RDATA_FRAMERATE]),
         RANGE_TO: int(renderData[c4d.RDATA_FRAMETO].Get() * renderData[c4d.RDATA_FRAMERATE]),
         RANGE_STEP: renderData[c4d.RDATA_FRAMESTEP],
-        FRAME_RATE: int(renderData[c4d.RDATA_FRAMERATE])
+        FRAME_RATE: int(renderData[c4d.RDATA_FRAMERATE]),
+        PATH: renderData[c4d.RDATA_PATH]
     }
 
 # ===================================================================
@@ -354,3 +358,29 @@ def get_projectName():
         return ''
 
     return projectName
+
+# ===================================================================
+def getFileSequenceNumber(filePrefix, fileName):
+# ===================================================================
+    # Removes the file prefix, name clash sequence and file extension
+    # to leave just the file sequence number, which is returned
+    # ...............................................................
+    fileSequenceNumber = fileName.replace(filePrefix, '')
+    # If clash naming prefix has been inserted, remove it
+    fileSequenceNumberStr = fileSequenceNumber.split('_').pop()
+    # Remove the file extension
+    fileSequenceNumberStr = fileSequenceNumberStr.split('.')[0]
+
+    return fileSequenceNumberStr
+
+# ===================================================================
+def getTestSequenceNumber(sequenceNumber, seqLen):
+# ===================================================================
+    # Builds and returns a sequence number str, based on an int
+    # .........................................................
+    # Build a string which is longer than needed with multiple leading zeroes,
+    # then subtract the last 'x' number of characters (hence times -1), depending on the length of
+    # the sequence number, which can be 4 or sometimes 5 for large projects
+    testSequenceNumberStr = ('000000' + str(sequenceNumber))[-1 * seqLen:]
+
+    return testSequenceNumberStr

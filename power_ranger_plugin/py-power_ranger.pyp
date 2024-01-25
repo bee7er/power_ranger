@@ -29,8 +29,11 @@ FRAME_RANGES_HELP_1 = 100012
 FRAME_RANGES_HELP_2 = 100013
 EDIT_FRAME_RANGES_TEXT = 100016
 RENDER_BUTTON = 100017
-CLOSE_BUTTON = 100018
+GAPS_BUTTON = 100018
+CLOSE_BUTTON = 100019
 TAG_LINE = 100021
+
+PATH = "RDATA_PATH"
 
 config = rb_functions.get_config_values()
 debug = bool(int(config.get(rb_functions.CONFIG_SECTION, 'debug')))
@@ -68,11 +71,12 @@ class RangerDlg(c4d.gui.GeDialog):
         # self.AddStaticText(id=TAG_LINE, flags=c4d.BFH_RIGHT, initw=440, name="https://powerhouse.industries", borderstyle=c4d.BORDER_NONE)
         self.GroupEnd()
 
-        self.GroupBegin(id=GROUP_ID_FORM, flags=c4d.BFH_SCALEFIT, cols=2, rows=5)
+        self.GroupBegin(id=GROUP_ID_FORM, flags=c4d.BFH_SCALEFIT, cols=3, rows=5)
         # Spaces: left, top, right, bottom
         self.GroupBorderSpace(10,20,10,20)
         """ Button fields """
         self.AddButton(id=CLOSE_BUTTON, flags=c4d.BFH_RIGHT | c4d.BFV_CENTER, initw=100, inith=16, name="Close")
+        self.AddButton(id=GAPS_BUTTON, flags=c4d.BFH_RIGHT | c4d.BFV_CENTER, initw=100, inith=16, name="Fill Those Gaps")
         self.AddButton(id=RENDER_BUTTON, flags=c4d.BFH_LEFT | c4d.BFV_CENTER, initw=100, inith=16, name="Render")
         self.GroupEnd()
 
@@ -129,12 +133,130 @@ class RangerDlg(c4d.gui.GeDialog):
 
             return True
 
+        # User clicked on the Gaps button
+        elif messageId == GAPS_BUTTON:
+            print("*** Gaps button clicked")
+
+            # Create entries in the render queue for gaps in the images in the output folder
+            if True == self.calcImageGapDetails():
+                # Update the dialog with the normalised frame ranges
+                self.SetString(id=EDIT_FRAME_RANGES_TEXT, value=str(self.customFrameRanges))
+
+            return True
+
+
         # User clicked on the Close button
         elif messageId == CLOSE_BUTTON:
             print("*** Dialog closed")
             # Close the Dialog
             self.Close()
             return True
+
+        return True
+
+    # ===================================================================
+    def calcImageGapDetails(self):
+    # ===================================================================
+        '''
+        Here we examine the contents of the output folder.
+        Using the rendered file prefix we check the list of image files
+        for any gaps in the sequence.  We return the sequence numbers of
+        the gaps.
+        '''
+        renderData = rb_functions.get_render_settings()
+        # Check to see if we have a save path defined
+        outputPath = renderData[PATH]
+        if "" == outputPath:
+            gui.MessageDialog("No save path has been specified in project settings")
+            return False
+
+        # Remove the generic fileName prefix, which is the last element of the list of folders
+        pathLst = outputPath.split(os.sep)
+        lastElem = pathLst.pop()
+        # Put the remaining path elements back into a string
+        outputPath = os.sep.join(pathLst)
+        # Get file contents from the output path
+        filePrefix = lastElem
+        if '$prj' == filePrefix:
+            filePrefix = rb_functions.get_projectName()
+
+        filePrefix = filePrefix.replace('.c4d', '')
+
+        atLeastOne = False
+        returnedSequenceNumbers = ''
+        sep = ''
+
+        directory = os.fsencode(outputPath)
+        # Reduce the contents to a list of numeric suffixes
+        seqLen = -1
+        dirSequenceNumberList = []
+        for file in os.listdir(directory):
+            fileName = os.fsdecode(file)
+            if fileName.startswith(filePrefix):
+                # We must check that the entries are all the same length
+                dirSequenceNumberElem = rb_functions.getFileSequenceNumber(filePrefix, fileName)
+                newLen = len(dirSequenceNumberElem)
+                if seqLen != -1 and newLen != seqLen:
+                    gui.MessageDialog("Multiple sequence lengths found. Folder cannot be processed.")
+                    return False
+
+                if False == dirSequenceNumberElem.isnumeric():
+                    # Ignore non-numeric elements
+                    print('*** Ignoring non-numeric sequence ' + dirSequenceNumberElem)
+                    continue
+
+                seqLen = newLen
+                dirSequenceNumberList.append(dirSequenceNumberElem)
+                atLeastOne = True
+                continue
+            else:
+                continue
+
+        if False == atLeastOne:
+            gui.MessageDialog(
+                "There are no image files that match the file prefix " +
+                filePrefix +
+                ".\nIt is not possible process an empty output folder."
+                )
+            return False
+
+        else:
+            sequenceNumber = -1
+            # Make sure our list of suffixes is sorted in ascending order
+            dirSequenceNumberList.sort()
+
+            # Make sure the list does not have duplicates
+            lastElem = ''
+            for dirSequenceNumberStr in dirSequenceNumberList:
+                if lastElem == dirSequenceNumberStr:
+                    print('*** Removing duplicate sequence ' + dirSequenceNumberStr)
+                    dirSequenceNumberList.remove(dirSequenceNumberStr)
+
+                lastElem = dirSequenceNumberStr
+
+            # Ok, looks like we have a list we can process
+            seqLen = len(dirSequenceNumberList[0])
+
+            for dirSequenceNumberStr in dirSequenceNumberList:
+                sequenceNumber += 1
+                testSequenceNumberStr = rb_functions.getTestSequenceNumber(sequenceNumber, seqLen)
+
+                if testSequenceNumberStr != dirSequenceNumberStr:
+                    while testSequenceNumberStr != dirSequenceNumberStr:
+
+                        print('*** Sequence Number required: ' + testSequenceNumberStr)
+                        returnedSequenceNumbers += (sep + str(int(testSequenceNumberStr)))
+                        sep = ','
+
+                        sequenceNumber += 1
+                        testSequenceNumberStr = rb_functions.getTestSequenceNumber(sequenceNumber, seqLen)
+
+        if '' == returnedSequenceNumbers:
+            gui.MessageDialog("There are no gaps.")
+            return False
+
+        else:
+            self.customFrameRanges = returnedSequenceNumbers
 
         return True
 
