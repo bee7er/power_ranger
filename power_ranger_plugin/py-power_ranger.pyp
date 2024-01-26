@@ -11,6 +11,7 @@ import os, sys
 import c4d
 from c4d import gui, bitmaps, utils
 from c4d import documents
+from c4d import modules
 # Add modules to the path before trying to reference them
 __root__ = os.path.dirname(__file__)
 if os.path.join(__root__, 'modules') not in sys.path: sys.path.insert(0, os.path.join(__root__, 'modules'))
@@ -206,7 +207,7 @@ class RangerDlg(c4d.gui.GeDialog):
                 if False == dirSequenceNumberElem.isnumeric():
                     if True == debug:
                         # Ignore non-numeric elements
-                        print('*** Ignoring non-numeric sequence ' + dirSequenceNumberElem)
+                        print("*** Ignoring non-numeric sequence '" + dirSequenceNumberElem + "'.")
                     continue
 
                 seqLen = newLen
@@ -218,9 +219,9 @@ class RangerDlg(c4d.gui.GeDialog):
 
         if False == atLeastOne:
             gui.MessageDialog(
-                "There are no image files that match the file prefix " +
+                "There are no image files that match the file prefix '" +
                 filePrefix +
-                ".\nIt is not possible process an empty output folder."
+                "'.\nIt is not possible process an empty output folder."
                 )
             return False
 
@@ -234,7 +235,7 @@ class RangerDlg(c4d.gui.GeDialog):
             for dirSequenceNumberStr in dirSequenceNumberList:
                 if lastElem == dirSequenceNumberStr:
                     if True == debug:
-                        print('*** Removing duplicate sequence ' + dirSequenceNumberStr)
+                        print("*** Removing duplicate sequence '" + dirSequenceNumberStr + "'.")
                     dirSequenceNumberList.remove(dirSequenceNumberStr)
 
                 lastElem = dirSequenceNumberStr
@@ -249,7 +250,7 @@ class RangerDlg(c4d.gui.GeDialog):
                 if testSequenceNumberStr != dirSequenceNumberStr:
                     while testSequenceNumberStr != dirSequenceNumberStr:
                         if True == debug:
-                            print('*** Sequence number required: ' + testSequenceNumberStr)
+                            print("*** Sequence number required: '" + testSequenceNumberStr + "'.")
                         returnedSequenceNumbers += (sep + str(int(testSequenceNumberStr)))
                         sep = ','
 
