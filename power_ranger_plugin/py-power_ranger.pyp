@@ -200,7 +200,7 @@ class RangerDlg(c4d.gui.GeDialog):
                 dirSequenceNumberElem = rb_functions.getFileSequenceNumber(filePrefix, fileName)
                 newLen = len(dirSequenceNumberElem)
                 if seqLen != -1 and newLen != seqLen:
-                    gui.MessageDialog("Multiple sequence lengths found. Folder cannot be processed.")
+                    gui.MessageDialog("Multiple sequence lengths: " + str(seqLen) + " and " + str(newLen) + "\nFolder cannot be processed.")
                     return False
 
                 if False == dirSequenceNumberElem.isnumeric():
@@ -257,7 +257,8 @@ class RangerDlg(c4d.gui.GeDialog):
                         testSequenceNumberStr = rb_functions.getTestSequenceNumber(sequenceNumber, seqLen)
 
         if '' == returnedSequenceNumbers:
-            gui.MessageDialog("There are no gaps.")
+            lastElem = dirSequenceNumberList.pop()
+            gui.MessageDialog("There are no gaps.\nHighest sequence found was: " + lastElem)
             return False
 
         else:
