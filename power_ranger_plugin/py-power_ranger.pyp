@@ -95,6 +95,7 @@ class RangerDlg(c4d.gui.GeDialog):
         # User click on Ok button
         if messageId == RENDER_BUTTON:
 
+            print("*** Rendering frames")
             if '' == rb_functions.get_projectName():
                 gui.MessageDialog("Please open your project file")
                 return True
@@ -135,6 +136,8 @@ class RangerDlg(c4d.gui.GeDialog):
 
         # User clicked on the Gaps button
         elif messageId == GAPS_BUTTON:
+
+            print('*** Checking for gaps in the rendered image sequence')
             # Create entries in the render queue for gaps in the images in the output folder
             if True == self.calcImageGapDetails():
                 # Update the dialog with the normalised frame ranges
@@ -145,6 +148,7 @@ class RangerDlg(c4d.gui.GeDialog):
 
         # User clicked on the Close button
         elif messageId == CLOSE_BUTTON:
+
             print("*** Dialog closed")
             # Close the Dialog
             self.Close()
@@ -161,7 +165,6 @@ class RangerDlg(c4d.gui.GeDialog):
         for any gaps in the sequence.  We return the sequence numbers of
         the gaps.
         '''
-        print('*** Checking for gaps in the rendered image sequence')
 
         renderData = rb_functions.get_render_settings()
         # Check to see if we have a save path defined
