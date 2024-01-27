@@ -113,7 +113,7 @@ class RangerDlg(c4d.gui.GeDialog):
                 print("*** Custom frame ranges following analyses: " + self.customFrameRanges)
 
             if True == debug:
-                print("Frame range(s): " + self.customFrameRanges)
+                print("*** Frame range(s): " + self.customFrameRanges)
 
             # Save changes to the config file
             rb_functions.update_config_values(rb_functions.CONFIG_RANGER_SECTION, [
@@ -170,6 +170,7 @@ class RangerDlg(c4d.gui.GeDialog):
         renderData = rb_functions.get_render_settings()
         # Check to see if we have a save path defined
         outputPath = renderData[PATH]
+        # Could default the path to os.sep, but for now we will reject it
         if "" == outputPath:
             gui.MessageDialog("No save path has been specified in project settings")
             return False

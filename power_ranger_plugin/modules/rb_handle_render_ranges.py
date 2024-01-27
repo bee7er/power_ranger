@@ -46,7 +46,7 @@ def handle_render_takes(customFrameRangesAry):
             frameFrom = int(range[0])
             frameTo = int(range[1])
             if True == debug:
-                print("Adding entry for range limit from: " + str(frameFrom) + " to " + str(frameTo))
+                print("*** Adding entry for range limit from: " + str(frameFrom) + " to " + str(frameTo))
 
             # Create new render data
             if True == verbose:

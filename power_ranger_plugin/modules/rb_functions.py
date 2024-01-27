@@ -104,7 +104,7 @@ def analyse_frame_ranges(frameRangeStr):
             print("*** WARNING: it is not possible to render negative frames for upper range limit")
 
         if True == verbose:
-            print("Adjusted rangelet: ", rangelet)
+            print("*** Adjusted rangelet: ", rangelet)
         # Check what we've got
         if 2 < len(rangelet):
             if True == verbose:
