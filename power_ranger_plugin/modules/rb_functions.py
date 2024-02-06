@@ -9,7 +9,7 @@ import os, platform, c4d
 try:
     # R2023
     import configparser as configurator
-    print("*** Power Ranger plugin started")
+    print("Power Ranger plugin started")
 except:
     # Prior to R2023
     import ConfigParser as configurator
@@ -98,13 +98,13 @@ def analyse_frame_ranges(frameRangeStr):
         # Convert from masked signs, we cannot render negative frame numbers
         if 0 <= str(rangelet[0]).find(MASK_SIGN):
             rangelet[0] = 0
-            print("*** WARNING: it is not possible to render negative frames for lower range limit")
+            print("WARNING: it is not possible to render negative frames for lower range limit")
         if 0 <= str(rangelet[1]).find(MASK_SIGN):
             rangelet[1] = 0
-            print("*** WARNING: it is not possible to render negative frames for upper range limit")
+            print("WARNING: it is not possible to render negative frames for upper range limit")
 
         if True == verbose:
-            print("*** Adjusted rangelet: ", rangelet)
+            print("Adjusted rangelet: ", rangelet)
         # Check what we've got
         if 2 < len(rangelet):
             if True == verbose:
@@ -273,12 +273,12 @@ def stateTransitionRangelet(rangelet):
                     # Action can only be e=error, x=exit or the next state
                     if ERROR == stateElem[2]:
                         if True == debug:
-                            print("*** Error detected. Ignoring rangelet: " + rangelet)
+                            print("Error detected. Ignoring rangelet: " + rangelet)
                         return False
 
                     elif EXIT == stateElem[2]:
                         if True == debug:
-                            print("*** Exit detected. Rangelet " + rangelet + " passes validation.")
+                            print("Exit detected. Rangelet " + rangelet + " passes validation.")
                         return returnRangelet
 
                     else:
@@ -319,7 +319,7 @@ def get_projectFullPath():
     # Gets project full path and name from the currently loaded project
     # .................................................................
     if '' == get_projectName():
-        print("*** A project has not yet been opened")
+        print("A project has not yet been opened")
         return ''
 
     md = c4d.documents.GetActiveDocument()
@@ -336,7 +336,7 @@ def get_projectPath():
     # Gets project path from the currently loaded project
     # ...................................................
     if '' == get_projectName():
-        print("*** A project has not yet been opened")
+        print("A project has not yet been opened")
         return ''
 
     md = c4d.documents.GetActiveDocument()
@@ -354,7 +354,7 @@ def get_projectName():
 
     projectName = c4d.documents.BaseDocument.GetDocumentName(md)
     if 0 <= projectName.find('Untitled'):
-        print("*** A project has not yet been opened")
+        print("A project has not yet been opened")
         return ''
 
     return projectName

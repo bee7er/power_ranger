@@ -96,7 +96,7 @@ class RangerDlg(c4d.gui.GeDialog):
         # User click on Ok button
         if messageId == RENDER_BUTTON:
 
-            print("*** Rendering frames")
+            print("Rendering frames")
             if '' == rb_functions.get_projectName():
                 gui.MessageDialog("Please open your project file")
                 return True
@@ -110,10 +110,10 @@ class RangerDlg(c4d.gui.GeDialog):
                 return False
 
             if True == debug:
-                print("*** Custom frame ranges following analyses: " + self.customFrameRanges)
+                print("Custom frame ranges following analyses: " + self.customFrameRanges)
 
             if True == debug:
-                print("*** Frame range(s): " + self.customFrameRanges)
+                print("Frame range(s): " + self.customFrameRanges)
 
             # Save changes to the config file
             rb_functions.update_config_values(rb_functions.CONFIG_RANGER_SECTION, [
@@ -130,7 +130,7 @@ class RangerDlg(c4d.gui.GeDialog):
 
             else:
                 if True == debug:
-                    print("*** Render frame ranges cancelled")
+                    print("Render frame ranges cancelled")
                 return False
 
             return True
@@ -138,7 +138,7 @@ class RangerDlg(c4d.gui.GeDialog):
         # User clicked on the Gaps button
         elif messageId == GAPS_BUTTON:
 
-            print('*** Checking for gaps in the rendered image sequence')
+            print('Checking for gaps in the rendered image sequence')
             # Create entries in the render queue for gaps in the images in the output folder
             if True == self.calcImageGapDetails():
                 # Update the dialog with the normalised frame ranges
@@ -150,7 +150,7 @@ class RangerDlg(c4d.gui.GeDialog):
         # User clicked on the Close button
         elif messageId == CLOSE_BUTTON:
 
-            print("*** Dialog closed")
+            print("Dialog closed")
             # Close the Dialog
             self.Close()
             return True
@@ -208,7 +208,7 @@ class RangerDlg(c4d.gui.GeDialog):
                 if False == dirSequenceNumberElem.isnumeric():
                     if True == debug:
                         # Ignore non-numeric elements
-                        print("*** Ignoring non-numeric sequence '" + dirSequenceNumberElem + "'.")
+                        print("Ignoring non-numeric sequence '" + dirSequenceNumberElem + "'.")
                     continue
 
                 seqLen = newLen
@@ -236,7 +236,7 @@ class RangerDlg(c4d.gui.GeDialog):
             for dirSequenceNumberStr in dirSequenceNumberList:
                 if lastElem == dirSequenceNumberStr:
                     if True == debug:
-                        print("*** Removing duplicate sequence '" + dirSequenceNumberStr + "'.")
+                        print("Removing duplicate sequence '" + dirSequenceNumberStr + "'.")
                     dirSequenceNumberList.remove(dirSequenceNumberStr)
 
                 lastElem = dirSequenceNumberStr
@@ -251,7 +251,7 @@ class RangerDlg(c4d.gui.GeDialog):
                 if testSequenceNumberStr != dirSequenceNumberStr:
                     while testSequenceNumberStr != dirSequenceNumberStr:
                         if True == debug:
-                            print("*** Sequence number required: '" + testSequenceNumberStr + "'.")
+                            print("Sequence number required: '" + testSequenceNumberStr + "'.")
                         returnedSequenceNumbers += (sep + str(int(testSequenceNumberStr)))
                         sep = ','
 
@@ -278,15 +278,15 @@ class RangerDlg(c4d.gui.GeDialog):
             )
         if False == yesNo:
             if True == debug:
-                print("*** User cancelled the request")
+                print("User cancelled the request")
             return False
 
         if True == rb_handle_render_ranges.handle_render_takes(self.customFrameRangesAry):
             if True == debug:
-                print("*** Custom frame ranges added to takes and processed successfully")
+                print("Custom frame ranges added to takes and processed successfully")
 
         else:
-            print("*** Unexpected result from processing custom frame ranges")
+            print("Unexpected result from processing custom frame ranges")
             return False
 
         return True
