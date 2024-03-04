@@ -349,7 +349,7 @@ if __name__ == "__main__":
 
     # Registers the plugin
     c4d.plugins.RegisterCommandPlugin(id=PLUGIN_ID,
-                                      str="Power Ranger using the Take System",
+                                      str="The Power Ranger Plugin",
                                       info=0,
                                       help="Power Ranger",
                                       dat=RangerDlgCommand(),

@@ -229,7 +229,7 @@ def stateTransitionRangelet(rangelet):
     # x = exit
     # - = minus sign
     # The table consists of:
-    #   state   test   goto state
+    #   state       test    goto state      mask sign indicator
 
     stateTable = [
         ['1','isDigit','2',''],
