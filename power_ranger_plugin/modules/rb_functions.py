@@ -9,11 +9,9 @@ import os, platform, c4d
 try:
     # R2023
     import configparser as configurator
-    print("Power Ranger plugin started")
 except:
     # Prior to R2023
     import ConfigParser as configurator
-    print("** Power Ranger plugin started")
 
 __root__ = os.path.dirname(os.path.dirname(__file__))
 

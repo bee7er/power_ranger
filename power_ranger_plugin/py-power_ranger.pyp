@@ -77,7 +77,7 @@ class RangerDlg(c4d.gui.GeDialog):
         self.GroupBorderSpace(10,20,10,20)
         """ Button fields """
         self.AddButton(id=CLOSE_BUTTON, flags=c4d.BFH_RIGHT | c4d.BFV_CENTER, initw=100, inith=16, name="Close")
-        self.AddButton(id=GAPS_BUTTON, flags=c4d.BFH_RIGHT | c4d.BFV_CENTER, initw=100, inith=16, name="Fill Those Gaps")
+        self.AddButton(id=GAPS_BUTTON, flags=c4d.BFH_RIGHT | c4d.BFV_CENTER, initw=150, inith=16, name="Fill Missing Frames")
         self.AddButton(id=RENDER_BUTTON, flags=c4d.BFH_LEFT | c4d.BFV_CENTER, initw=100, inith=16, name="Render")
         self.GroupEnd()
 
@@ -331,29 +331,33 @@ class RangerDlgCommand(c4d.plugins.CommandData):
 # main entry function
 # ===================================================================
 if __name__ == "__main__":
-    if True == verbose:
-        print("Setting up Power Ranger Plugin")
+    try:
+        print("* Setting up Power Ranger Version 1")
 
-    # Retrieves the icon path
-    directory, _ = os.path.split(__file__)
-    fn = os.path.join(directory, "res", "icon_ranger.tif")
+        # Retrieves the icon path
+        directory, _ = os.path.split(__file__)
+        fn = os.path.join(directory, "res", "icon_ranger.tif")
 
-    # Creates a BaseBitmap
-    bbmp = c4d.bitmaps.BaseBitmap()
-    if bbmp is None:
-        raise MemoryError("Failed to create a BaseBitmap.")
+        # Creates a BaseBitmap
+        bbmp = c4d.bitmaps.BaseBitmap()
+        if bbmp is None:
+            raise MemoryError("Failed to create a BaseBitmap.")
 
-    # Init the BaseBitmap with the icon
-    if bbmp.InitWith(fn)[0] != c4d.IMAGERESULT_OK:
-        raise MemoryError("Failed to initialise the BaseBitmap.")
+        # Init the BaseBitmap with the icon
+        if bbmp.InitWith(fn)[0] != c4d.IMAGERESULT_OK:
+            raise MemoryError("Failed to initialise the BaseBitmap.")
 
-    # Registers the plugin
-    c4d.plugins.RegisterCommandPlugin(id=PLUGIN_ID,
-                                      str="The Power Ranger Plugin",
-                                      info=0,
-                                      help="Power Ranger",
-                                      dat=RangerDlgCommand(),
-                                      icon=bbmp)
+        # Registers the plugin
+        c4d.plugins.RegisterCommandPlugin(id=PLUGIN_ID,
+                                          str="Power Ranger",
+                                          info=0,
+                                          help="Power Ranger",
+                                          dat=RangerDlgCommand(),
+                                          icon=bbmp)
 
-    if True == verbose:
-        print("Power Ranger Plugin set up ok")
+        print("* Power Ranger set up ok")
+
+    except Exception as e:
+        message = "* Error on Power Ranger set up: " + str(e)
+        print(message)
+        gui.MessageDialog(message)
