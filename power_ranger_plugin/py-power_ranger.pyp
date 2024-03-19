@@ -171,7 +171,7 @@ class RangerDlg(c4d.gui.GeDialog):
         outputPath = rb_functions.get_ResultsOutputDirectory()
         # Check to see if we have a save path defined
         if "" == outputPath:
-            gui.MessageDialog("No save path has been specified in project settings")
+            gui.MessageDialog("No output folder has been specified in project settings")
             return False
 
         # Remove the generic fileName prefix, which is the last element of the list of folders
