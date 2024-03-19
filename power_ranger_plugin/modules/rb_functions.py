@@ -5,6 +5,7 @@ Author:         Brian Etheridge
 """
 
 import os, platform, c4d
+from c4d import documents
 
 try:
     # R2023
@@ -382,3 +383,24 @@ def getTestSequenceNumber(sequenceNumber, seqLen):
     testSequenceNumberStr = ('000000' + str(sequenceNumber))[-1 * seqLen:]
 
     return testSequenceNumberStr
+
+# ===================================================================
+def get_ResultsOutputDirectory():
+# ===================================================================
+    # Gets the directory from the project settings
+    # ............................................
+    doc = documents.GetActiveDocument()
+    activeRenderData = doc.GetActiveRenderData()
+    if None == activeRenderData:
+        raise RuntimeError("Failed to retrieve the active render data")
+    # Check to see if we have a save path defined
+    if "" == activeRenderData[c4d.RDATA_PATH]:
+        return False
+
+    # Note how to resolve tokens in the render data
+    savePath = c4d.modules.tokensystem.StringConvertTokens(activeRenderData[c4d.RDATA_PATH], rpData={'_doc': doc, '_rData': activeRenderData})
+    # Check the save path exists
+    if True != os.path.exists(savePath):
+        os.mkdir(savePath)
+
+    return savePath

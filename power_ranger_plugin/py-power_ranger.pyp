@@ -96,10 +96,11 @@ class RangerDlg(c4d.gui.GeDialog):
         # User click on Ok button
         if messageId == RENDER_BUTTON:
 
-            print("Rendering frames")
-            if '' == rb_functions.get_projectName():
-                gui.MessageDialog("Please open your project file")
+            if False == rb_functions.get_ResultsOutputDirectory():
+                gui.MessageDialog("Please set the output folder in render settings")
                 return True
+
+            print("Rendering frames")
 
             self.customFrameRanges = self.GetString(EDIT_FRAME_RANGES_TEXT)
 
@@ -167,10 +168,8 @@ class RangerDlg(c4d.gui.GeDialog):
         the gaps.
         '''
 
-        renderData = rb_functions.get_render_settings()
+        outputPath = rb_functions.get_ResultsOutputDirectory()
         # Check to see if we have a save path defined
-        outputPath = renderData[PATH]
-        # Could default the path to os.sep, but for now we will reject it
         if "" == outputPath:
             gui.MessageDialog("No save path has been specified in project settings")
             return False
@@ -306,6 +305,14 @@ class RangerDlgCommand(c4d.plugins.CommandData):
         Called when the user executes CallCommand() or a menu option
         Returns True if the command success.
         """
+
+        directory, _ = os.path.split(__file__)
+        if 0 > directory.find("Preferences"):
+            gui.MessageDialog("Power Ranger\nPlease check where you have installed this plugin. It should be below your 'Preferences' folder.")
+
+            print("* Power Ranger may be installed in an incorrect location: " + directory)
+            print("* Power Ranger should normally be installed below Preferences folder")
+
         # Creates the dialog if it does not already exists
         if self.dialog is None:
             self.dialog = RangerDlg()
