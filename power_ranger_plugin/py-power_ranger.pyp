@@ -335,10 +335,10 @@ class RangerDlgCommand(c4d.plugins.CommandData):
         preferences = os.path.dirname(storage.GeGetC4DPath(c4d.C4D_PATH_PREFS))
         directory, _ = os.path.split(__file__)
         if 0 > directory.find(preferences):
-            gui.MessageDialog("Power Ranger\nPlease check where you have installed this plugin. It should normaly be below your 'Preferences' folder and may have an impact on the operation of this plugin.")
+            gui.MessageDialog("Power Ranger\nPlease check where you have installed this plugin. It should normaly be placed in the 'plugins' folder\nfound by clicking 'Preferences Folder' in the Edit > Preferences panel.\nYou may find it will not function in its current location.")
 
             print("* Power Ranger may be installed in an incorrect location: \n\t" + directory)
-            print("* Power Ranger should normally be installed below Preferences folder: \n\t" + preferences)
+            print("* Power Ranger should normally be placed in the 'plugins' folder\nfound by clicking 'Preferences Folder' in the Edit > Preferences panel: \n\t" + preferences)
 
         # Creates the dialog if it does not already exists
         if self.dialog is None:
