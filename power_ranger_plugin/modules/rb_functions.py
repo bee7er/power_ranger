@@ -399,8 +399,5 @@ def get_ResultsOutputDirectory():
 
     # Note how to resolve tokens in the render data
     savePath = c4d.modules.tokensystem.StringConvertTokens(activeRenderData[c4d.RDATA_PATH], rpData={'_doc': doc, '_rData': activeRenderData})
-    # Check the save path exists
-    if True != os.path.exists(savePath):
-        os.mkdir(savePath)
 
     return savePath

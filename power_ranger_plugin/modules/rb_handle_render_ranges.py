@@ -39,8 +39,11 @@ def handle_render_takes(customFrameRangesAry):
             raise RuntimeError("Failed to retrieve the active render data")
 
         # Check to see if we have a save path defined
-        if "" == activeRenderData[c4d.RDATA_PATH]:
+        savePath = rb_functions.get_ResultsOutputDirectory()
+        if False == savePath:
             print("WARNING: No save path has been defined")
+
+        print("Rendering selected takes with save path: " + savePath)
 
         for range in customFrameRangesAry:
             frameFrom = int(range[0])

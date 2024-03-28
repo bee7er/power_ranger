@@ -12,6 +12,7 @@ import c4d
 from c4d import gui, bitmaps, utils
 from c4d import documents
 from c4d import modules
+from c4d import storage
 # Add modules to the path before trying to reference them
 __root__ = os.path.dirname(__file__)
 if os.path.join(__root__, 'modules') not in sys.path: sys.path.insert(0, os.path.join(__root__, 'modules'))
@@ -32,6 +33,7 @@ EDIT_FRAME_RANGES_TEXT = 100016
 RENDER_BUTTON = 100017
 GAPS_BUTTON = 100018
 CLOSE_BUTTON = 100019
+SHOW_BUTTON = 100020
 TAG_LINE = 100021
 
 PATH = "RDATA_PATH"
@@ -72,12 +74,13 @@ class RangerDlg(c4d.gui.GeDialog):
         # self.AddStaticText(id=TAG_LINE, flags=c4d.BFH_RIGHT, initw=440, name="https://powerhouse.industries", borderstyle=c4d.BORDER_NONE)
         self.GroupEnd()
 
-        self.GroupBegin(id=GROUP_ID_FORM, flags=c4d.BFH_SCALEFIT, cols=3, rows=5)
+        self.GroupBegin(id=GROUP_ID_FORM, flags=c4d.BFH_SCALEFIT, cols=4, rows=5)
         # Spaces: left, top, right, bottom
         self.GroupBorderSpace(10,20,10,20)
         """ Button fields """
         self.AddButton(id=CLOSE_BUTTON, flags=c4d.BFH_RIGHT | c4d.BFV_CENTER, initw=100, inith=16, name="Close")
         self.AddButton(id=GAPS_BUTTON, flags=c4d.BFH_RIGHT | c4d.BFV_CENTER, initw=150, inith=16, name="Fill Missing Frames")
+        # self.AddButton(id=SHOW_BUTTON, flags=c4d.BFH_RIGHT | c4d.BFV_CENTER, initw=150, inith=16, name="Show Output")
         self.AddButton(id=RENDER_BUTTON, flags=c4d.BFH_LEFT | c4d.BFV_CENTER, initw=100, inith=16, name="Render")
         self.GroupEnd()
 
@@ -100,9 +103,9 @@ class RangerDlg(c4d.gui.GeDialog):
                 gui.MessageDialog("Please set the output folder in render settings")
                 return True
 
-            print("Rendering frames")
-
             self.customFrameRanges = self.GetString(EDIT_FRAME_RANGES_TEXT)
+
+            print("Rendering frames: " + self.customFrameRanges)
 
             # Analyse the custom frame ranges
             self.customFrameRanges, self.customFrameRangesAry = rb_functions.analyse_frame_ranges(self.customFrameRanges)
@@ -116,10 +119,16 @@ class RangerDlg(c4d.gui.GeDialog):
             if True == debug:
                 print("Frame range(s): " + self.customFrameRanges)
 
-            # Save changes to the config file
-            rb_functions.update_config_values(rb_functions.CONFIG_RANGER_SECTION, [
-                ('customFrameRanges', str(self.customFrameRanges))
-                ])
+            try:
+                # Save changes to the config file
+                rb_functions.update_config_values(rb_functions.CONFIG_RANGER_SECTION, [
+                    ('customFrameRanges', str(self.customFrameRanges))
+                    ])
+            except Exception as e:
+                message = "Unexpected error: " + str(e)
+                print(message)
+                gui.MessageDialog(message)
+                return False
 
             # Create entries in the render queue for the frame ranges entered
             if True == self.submitRangeDetails():
@@ -147,6 +156,18 @@ class RangerDlg(c4d.gui.GeDialog):
 
             return True
 
+        # User clicked on the Show rendered frames button
+        elif messageId == SHOW_BUTTON:
+
+            savePath = rb_functions.get_ResultsOutputDirectory()
+            if True == savePath:
+                print("No save path has been specified")
+            else:
+                print("Show files in save path: " + savePath)
+                # Show the Files Dialog
+                storage.ShowInFinder(savePath)
+
+            return True
 
         # User clicked on the Close button
         elif messageId == CLOSE_BUTTON:
@@ -168,17 +189,17 @@ class RangerDlg(c4d.gui.GeDialog):
         the gaps.
         '''
 
-        outputPath = rb_functions.get_ResultsOutputDirectory()
+        savePath = rb_functions.get_ResultsOutputDirectory()
         # Check to see if we have a save path defined
-        if "" == outputPath:
-            gui.MessageDialog("No output folder has been specified in project settings")
+        if "" == savePath:
+            gui.MessageDialog("No save path has been specified in project settings")
             return False
 
         # Remove the generic fileName prefix, which is the last element of the list of folders
-        pathLst = outputPath.split(os.sep)
+        pathLst = savePath.split(os.sep)
         lastElem = pathLst.pop()
         # Put the remaining path elements back into a string
-        outputPath = os.sep.join(pathLst)
+        savePath = os.sep.join(pathLst)
         # Get file contents from the output path
         filePrefix = lastElem
         if '$prj' == filePrefix:
@@ -190,12 +211,16 @@ class RangerDlg(c4d.gui.GeDialog):
         returnedSequenceNumbers = ''
         sep = ''
 
-        directory = os.fsencode(outputPath)
+        directory = os.fsencode(savePath)
         # Reduce the contents to a list of numeric suffixes
         seqLen = -1
         dirSequenceNumberList = []
         for file in os.listdir(directory):
             fileName = os.fsdecode(file)
+            # Ignore directories
+            if False == os.path.isfile(os.path.join(directory, file)):
+                continue
+
             if fileName.startswith(filePrefix):
                 # We must check that the entries are all the same length
                 dirSequenceNumberElem = rb_functions.getFileSequenceNumber(filePrefix, fileName)
@@ -221,7 +246,7 @@ class RangerDlg(c4d.gui.GeDialog):
             gui.MessageDialog(
                 "There are no image files that match the file prefix '" +
                 filePrefix +
-                "'.\nIt is not possible process an empty output folder."
+                "'.\nIt is not possible to process an empty output folder."
                 )
             return False
 
@@ -306,12 +331,14 @@ class RangerDlgCommand(c4d.plugins.CommandData):
         Returns True if the command success.
         """
 
+        # Get the parent folder of the preferences folder and check current directoryhas it in the path
+        preferences = os.path.dirname(storage.GeGetC4DPath(c4d.C4D_PATH_PREFS))
         directory, _ = os.path.split(__file__)
-        if 0 > directory.find("Preferences"):
-            gui.MessageDialog("Power Ranger\nPlease check where you have installed this plugin. It should be below your 'Preferences' folder.")
+        if 0 > directory.find(preferences):
+            gui.MessageDialog("Power Ranger\nPlease check where you have installed this plugin. It should normaly be below your 'Preferences' folder and may have an impact on the operation of this plugin.")
 
-            print("* Power Ranger may be installed in an incorrect location: " + directory)
-            print("* Power Ranger should normally be installed below Preferences folder")
+            print("* Power Ranger may be installed in an incorrect location: \n\t" + directory)
+            print("* Power Ranger should normally be installed below Preferences folder: \n\t" + preferences)
 
         # Creates the dialog if it does not already exists
         if self.dialog is None:
