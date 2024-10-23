@@ -28,7 +28,6 @@ PLUGIN_ID = 1062133
 GROUP_ID_HELP = 100000
 GROUP_ID_FORM = 100001
 
-FRAME_RANGES_HELP_0 = 100011
 FRAME_RANGES_HELP_1 = 100012
 FRAME_RANGES_HELP_2 = 100013
 EDIT_FRAME_RANGES_TEXT = 100016
@@ -58,13 +57,12 @@ class RangerDlg(c4d.gui.GeDialog):
     # ===================================================================
         """ Called when Cinema 4D creates the dialog """
 
-        self.SetTitle("Power Ranger " + version)
+        self.SetTitle("Power Ranger")
 
         self.GroupBegin(id=GROUP_ID_HELP, flags=c4d.BFH_SCALEFIT, cols=1, rows=4)
         # Spaces: left, top, right, bottom
         self.GroupBorderSpace(10,10,10,10)
         """ Instructions """
-        self.AddStaticText(id=FRAME_RANGES_HELP_0, flags=c4d.BFV_MASK, initw=385, name="", borderstyle=c4d.BORDER_NONE)
         self.AddStaticText(id=FRAME_RANGES_HELP_1, flags=c4d.BFV_MASK, initw=385, name="Specify one or more frames or ranges of frames.", borderstyle=c4d.BORDER_NONE)
         self.AddStaticText(id=FRAME_RANGES_HELP_2, flags=c4d.BFV_MASK, initw=385, name="Example: 1,8,10-15,55", borderstyle=c4d.BORDER_NONE)
         self.GroupEnd()
@@ -75,8 +73,8 @@ class RangerDlg(c4d.gui.GeDialog):
         """ Custom ranges field """
         self.AddEditText(id=EDIT_FRAME_RANGES_TEXT, flags=c4d.BFV_MASK, initw=440, inith=16, editflags=0)
         self.SetString(id=EDIT_FRAME_RANGES_TEXT, value=self.customFrameRanges)
-        self.AddStaticText(id=TAG_LINE, flags=c4d.BFH_FIT | c4d.BFH_RIGHT, initw=440, name="More info and tip us if you like:", borderstyle=c4d.BORDER_NONE)
-        self.AddButton(id=LINK_BUTTON, flags=c4d.BFH_CENTER, initw=460, inith=16, name="Powerhouse Industries")
+        self.AddStaticText(id=TAG_LINE, flags=c4d.BFH_FIT | c4d.BFH_RIGHT, initw=440, name="Powerhouse Industries, " + version, borderstyle=c4d.BORDER_NONE)
+        self.AddButton(id=LINK_BUTTON, flags=c4d.BFH_CENTER, initw=460, inith=16, name="Visit Our Website & Support Us")
 
         self.GroupEnd()
 
@@ -201,7 +199,7 @@ class RangerDlg(c4d.gui.GeDialog):
 
         savePath = rb_functions.get_ResultsOutputDirectory()
         # Check to see if we have a save path defined
-        if "" == savePath:
+        if "" == savePath or False == savePath:
             gui.MessageDialog("No save path has been specified in project settings")
             return False
 
