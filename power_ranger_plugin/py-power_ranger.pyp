@@ -224,13 +224,22 @@ class RangerDlg(c4d.gui.GeDialog):
         seqLen = -1
         dirSequenceNumberList = []
         for file in os.listdir(directory):
-            fileName = os.fsdecode(file)
+            # fileName = os.fsdecode(file)
+            fileName = os.path.splitext(file)[0].decode('utf-8')
+
             # Ignore directories
             if False == os.path.isfile(os.path.join(directory, file)):
                 continue
 
+            # Special case where the file has no sequence number attached to it, ignore it
+            if fileName == filePrefix:
+                if True == debug:
+                    # Ignore image with no sequence number
+                    print("Ignoring image with no sequence number.")
+                continue
+
             if fileName.startswith(filePrefix):
-                # We must check that the entries are all the same length
+                # We must check that the sequence numbers of all the entries are all the same length
                 dirSequenceNumberElem = rb_functions.getFileSequenceNumber(filePrefix, fileName)
                 newLen = len(dirSequenceNumberElem)
                 if seqLen != -1 and newLen != seqLen:

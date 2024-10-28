@@ -371,8 +371,6 @@ def getFileSequenceNumber(filePrefix, fileName):
     fileSequenceNumber = fileName.replace(filePrefix, '')
     # If clash naming prefix has been inserted, remove it
     fileSequenceNumberStr = fileSequenceNumber.split('_').pop()
-    # Remove the file extension
-    fileSequenceNumberStr = fileSequenceNumberStr.split('.')[0]
 
     return fileSequenceNumberStr
 
